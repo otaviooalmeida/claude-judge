@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+
+# Generated and user-entered paid-run artifacts
+/data/candidates/*.jsonl
+/data/human/*.jsonl
+/data/results/*.json
+/data/results/*.jsonl
+
+# Keep empty artifact directories in source distributions
+!/data/candidates/.gitkeep
+!/data/human/.gitkeep
+!/data/results/.gitkeep

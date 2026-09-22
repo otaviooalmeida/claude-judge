@@ -1,0 +1,26 @@
+{
+  "name": "can-claude-judge-claude",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A reproducible, budget-conscious benchmark for Claude as an LLM judge.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "plan": "node src/cli/plan-run.js",
+    "generate:candidates": "node src/cli/generate-candidates.js",
+    "annotate:template": "node src/cli/create-human-template.js",
+    "verbosity:template": "node src/cli/create-verbosity-template.js",
+    "verbosity:finalize": "node src/cli/finalize-verbosity.js",
+    "judge": "node src/cli/run-judging.js",
+    "build:report": "node src/cli/build-report.js",
+    "check": "npm test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}
