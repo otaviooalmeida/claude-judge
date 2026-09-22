@@ -39,4 +39,4 @@ A imagem dos resultados da sessão de avaliação:
 
 ![Resultados da sessão do Claude Judge](canClaudeJudgeClaude.png)
 
-Abra [`public/index.html`](public/index.html) após executar `npm run build:report` para consultar o relatório completo.
+Em 800 julgamentos, os dois modelos Claude apresentaram repetibilidade perfeita e baixa sensibilidade à ordem das respostas e ao nível de detalhamento, mas a concordância com a referência humana ficou em torno de 38–40%, indicando que os modelos foram muito consistentes entre si, porém pouco alinhados ao padrão externo de avaliação.
