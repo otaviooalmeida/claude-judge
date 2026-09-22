@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can Claude Judge Claude?</title>
+<style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#172033; --muted:#5c677d; --line:#d9dfeb; --panel:#fff; --accent:#6c4ce6; --bg:#f5f7fb; }
+* { box-sizing:border-box; } body { margin:0; color:var(--ink); background:var(--bg); line-height:1.5; }
+main { max-width:1100px; margin:0 auto; padding:48px 24px 80px; } h1 { margin:0 0 8px; font-size:clamp(2rem,5vw,3.5rem); } h2 { margin-top:40px; } h3 { margin:0 0 6px; } p { color:var(--muted); } .eyebrow { color:var(--accent); font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; } .card, .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:0 5px 18px #24355b0d; } .value { font-size:1.8rem; font-weight:750; } .label { color:var(--muted); font-size:.9rem; }
+table { border-collapse:collapse; width:100%; background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; } th,td { text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); } th { background:#f0f2f8; font-size:.85rem; } tr:last-child td { border-bottom:0; }
+.tag { display:inline-block; border-radius:999px; padding:3px 9px; background:#ede9fe; color:#5138b7; font-size:.8rem; font-weight:700; } code { background:#eef1f7; border-radius:5px; padding:2px 5px; } .note { border-left:4px solid var(--accent); padding-left:14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Reproducible exploratory benchmark</div>
+  <h1>Can Claude Judge Claude?</h1>
+  <p>Comparing Claude models as automated judges of the same frozen Claude-generated answers.</p>
+  <div class="grid">
+    <div class="card"><div class="label">Total judgments</div><div class="value">800</div></div>
+    <div class="card"><div class="label">Completed</div><div class="value">797</div></div>
+    <div class="card"><div class="label">Failed / incomplete</div><div class="value">3</div></div>
+    <div class="card"><div class="label">Judge models</div><div class="value" style="font-size:1rem">claude-haiku-4-5-20251001 + claude-sonnet-4-6</div></div>
+  </div>
+
+  <h2>Findings</h2>
+  <div class="panel">
+    <p class="note">Agreement is compared with one human annotator's labels. A model can be repeatable while being consistently wrong; agreement is not validity.</p>
+    <table><thead><tr><th>Judge model</th><th>Prompt</th><th>n</th><th>Preference agreement</th><th>95% Wilson interval</th><th>Cohen's κ</th><th>Recorded batch cost</th></tr></thead>
+    <tbody><tr><td>claude-haiku-4-5-20251001</td><td>baseline</td><td>39</td><td>38.5%</td><td>24.9%–54.1%</td><td>0.000</td><td>$0.1681</td></tr><tr><td>claude-haiku-4-5-20251001</td><td>anchored</td><td>40</td><td>40.0%</td><td>26.3%–55.4%</td><td>0.000</td><td>$0.1700</td></tr><tr><td>claude-sonnet-4-6</td><td>baseline</td><td>40</td><td>40.0%</td><td>26.3%–55.4%</td><td>0.000</td><td>$0.4328</td></tr><tr><td>claude-sonnet-4-6</td><td>anchored</td><td>40</td><td>40.0%</td><td>26.3%–55.4%</td><td>0.000</td><td>$0.4295</td></tr></tbody></table>
+  </div>
+
+  <h2>Bias and stability</h2>
+  <div class="panel">
+    <p>Position sensitivity, verbosity sensitivity, and repeatability are computed from fresh trials and mapped back to candidate identity. These measurements are included in the saved analysis when the main experiment has completed.</p>
+    <table><thead><tr><th>Judge model</th><th>Prompt</th><th>Repeatability</th><th>Position change rate</th><th>Longer wins</th><th>Shorter wins</th><th>Ties</th></tr></thead>
+    <tbody><tr><td>claude-haiku-4-5-20251001</td><td>baseline</td><td>100.0%</td><td>0.0%</td><td>0</td><td>6</td><td>34</td></tr><tr><td>claude-haiku-4-5-20251001</td><td>anchored</td><td>100.0%</td><td>2.5%</td><td>0</td><td>5</td><td>35</td></tr><tr><td>claude-sonnet-4-6</td><td>baseline</td><td>100.0%</td><td>7.5%</td><td>0</td><td>14</td><td>26</td></tr><tr><td>claude-sonnet-4-6</td><td>anchored</td><td>100.0%</td><td>5.0%</td><td>0</td><td>10</td><td>30</td></tr></tbody></table>
+    <span class="tag">Temperature 0 judge</span> <span class="tag">Batch API</span> <span class="tag">Structured JSON</span>
+  </div>
+
+  <h2>Case explorer</h2>
+  <div class="panel">
+    <p>Explore individual source passages, candidate responses, pre-registered human labels, and Claude judgments from saved artifacts. The report is generated from saved results and never calls an API from the browser.</p>
+    <details><summary>cal-factual-01 · factual_qa</summary><p><strong>Task:</strong> In which year did the Riverlight Library open its west branch? Answer using only the passage.</p><p><strong>Source:</strong> The Riverlight Library opened its west branch in 2012. The branch has a reading room with forty seats.</p><h4>cal-factual-01-a</h4><pre>According to the passage, the Riverlight Library opened its west branch in 2012.</pre><h4>cal-factual-01-b</h4><pre>Based on the passage, the Riverlight Library opened its west branch in **2012**.</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>cal-factual-02 · factual_qa</summary><p><strong>Task:</strong> Who designed the first Solace bicycle? Answer using only the passage.</p><p><strong>Source:</strong> Mira Chen designed the first Solace bicycle in 1986. A later model, the Solace II, introduced aluminum handlebars.</p><h4>cal-factual-02-a</h4><pre>According to the passage, Mira Chen designed the first Solace bicycle in 1986.</pre><h4>cal-factual-02-b</h4><pre>Based on the passage, **Mira Chen** designed the first Solace bicycle in 1986.</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>factual-01 · factual_qa</summary><p><strong>Task:</strong> What did the solar lamps replace? Answer using only the passage.</p><p><strong>Source:</strong> The town of Bellmere installed solar lamps along Harbor Road in 2018. The lamps replaced older gas fixtures.</p><h4>factual-01-b</h4><pre>According to the passage, the solar lamps replaced **older gas fixtures**.</pre><h4>factual-01-a</h4><pre>According to the passage, the solar lamps replaced older gas fixtures.</pre><h4>factual-01-short</h4><pre>According to the passage, the solar lamps replaced older gas fixtures.</pre><h4>factual-01-long</h4><pre>According to the information provided in the passage, the solar lamps were installed to replace the older gas fixtures that had previously been used.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>factual-02 · factual_qa</summary><p><strong>Task:</strong> How many passengers can the Northwind ferry carry? Answer using only the passage.</p><p><strong>Source:</strong> The Northwind ferry carries up to 120 passengers and makes three crossings each weekday.</p><h4>factual-02-b</h4><pre>Based on the passage, the Northwind ferry can carry up to **120 passengers**.</pre><h4>factual-02-a</h4><pre>According to the passage, the Northwind ferry can carry up to 120 passengers.</pre><h4>factual-02-short</h4><pre>According to the passage, the Northwind ferry can carry up to 120 passengers.</pre><h4>factual-02-long</h4><pre>According to the information stated in the passage, the Northwind ferry is capable of carrying a maximum of 120 passengers at one time.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>factual-03 · factual_qa</summary><p><strong>Task:</strong> Where was the Arbordale Museum&#39;s photography collection moved? Answer using only the passage.</p><p><strong>Source:</strong> In 2009, the Arbordale Museum moved its photography collection to a climate-controlled archive beneath the east gallery.</p><h4>factual-03-a</h4><pre>According to the passage, the Arbordale Museum&#39;s photography collection was moved to a climate-controlled archive beneath the east gallery in 2009.</pre><h4>factual-03-b</h4><pre>According to the passage, the Arbordale Museum&#39;s photography collection was moved to a **climate-controlled archive beneath the east gallery**.</pre><h4>factual-03-short</h4><pre>According to the passage, the Arbordale Museum&#39;s photography collection was moved to a climate-controlled archive beneath the east gallery in 2009.</pre><h4>factual-03-long</h4><pre>According to the passage, in 2009 the Arbordale Museum&#39;s photography collection was relocated to a climate-controlled archive located beneath the east gallery.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>factual-04 · factual_qa</summary><p><strong>Task:</strong> How long does the Lumen Festival last? Answer using only the passage.</p><p><strong>Source:</strong> The Lumen Festival lasts four days, from Thursday through Sunday. Its opening concert is held outdoors.</p><h4>factual-04-a</h4><pre>According to the passage, the Lumen Festival lasts four days, from Thursday through Sunday.</pre><h4>factual-04-b</h4><pre>According to the passage, the Lumen Festival lasts **four days**, running from Thursday through Sunday.</pre><h4>factual-04-short</h4><pre>According to the passage, the Lumen Festival lasts four days, from Thursday through Sunday.</pre><h4>factual-04-long</h4><pre>According to the passage, the Lumen Festival takes place over a four-day period, beginning on Thursday and continuing through Sunday.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>factual-05 · factual_qa</summary><p><strong>Task:</strong> On what date did Cedar Station record the first snowfall? Answer using only the passage.</p><p><strong>Source:</strong> A team at Cedar Station recorded the first frost on October 17. They recorded the first snowfall on November 3.</p><h4>factual-05-a</h4><pre>According to the passage, Cedar Station recorded the first snowfall on November 3.</pre><h4>factual-05-b</h4><pre>According to the passage, Cedar Station recorded the first snowfall on **November 3**.</pre><h4>factual-05-short</h4><pre>According to the passage, Cedar Station recorded the first snowfall on November 3.</pre><h4>factual-05-long</h4><pre>According to the information given in the passage, the first snowfall recorded at Cedar Station occurred on November 3.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>factual-06 · factual_qa</summary><p><strong>Task:</strong> How many seats are in the smaller studio? Answer using only the passage.</p><p><strong>Source:</strong> The Maris Theater seats 680 people. Its smaller studio, located upstairs, seats 90.</p><h4>factual-06-a</h4><pre>The smaller studio seats 90 people.</pre><h4>factual-06-b</h4><pre>According to the passage, the smaller studio seats **90** people.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>factual-07 · factual_qa</summary><p><strong>Task:</strong> Where was the first edition of Field Notes printed? Answer using only the passage.</p><p><strong>Source:</strong> The first edition of the Field Notes journal was printed in Lisbon. The second edition was printed in Porto.</p><h4>factual-07-b</h4><pre>According to the passage, the first edition of the Field Notes journal was printed in **Lisbon**.</pre><h4>factual-07-a</h4><pre>According to the passage, the first edition of the Field Notes journal was printed in Lisbon.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>factual-08 · factual_qa</summary><p><strong>Task:</strong> Why did the Oriole team select cork? Answer using only the passage.</p><p><strong>Source:</strong> After testing five materials, the Oriole team selected cork because it was the lightest option that met their insulation requirement.</p><h4>factual-08-a</h4><pre>The Oriole team selected cork because it was the lightest option that met their insulation requirement.</pre><h4>factual-08-b</h4><pre>Based on the passage, the Oriole team selected cork because it was the **lightest option that met their insulation requirement**.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>factual-09 · factual_qa</summary><p><strong>Task:</strong> On which days are Greenbank&#39;s evening appointments available? Answer using only the passage.</p><p><strong>Source:</strong> The Greenbank clinic began offering evening appointments in March. The service is available on Tuesdays and Thursdays.</p><h4>factual-09-a</h4><pre>According to the passage, Greenbank&#39;s evening appointments are available on Tuesdays and Thursdays.</pre><h4>factual-09-b</h4><pre>Based on the passage, Greenbank&#39;s evening appointments are available on **Tuesdays and Thursdays**.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>factual-10 · factual_qa</summary><p><strong>Task:</strong> Where is the footbridge located in relation to the mill? Answer using only the passage.</p><p><strong>Source:</strong> Nora&#39;s map shows a footbridge crossing the Alder Creek immediately north of the mill. The map does not show when the bridge was built.</p><h4>factual-10-a</h4><pre>According to the passage, the footbridge is located immediately north of the mill, crossing the Alder Creek.</pre><h4>factual-10-b</h4><pre>According to the passage, the footbridge is located **immediately north of the mill**, crossing the Alder Creek.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>cal-summary-01 · constrained_summary</summary><p><strong>Task:</strong> Summarize the reopening in one sentence. Include the cause of the reopening and the number of new plant beds.</p><p><strong>Source:</strong> The Harbor Garden reopened after volunteers repaired its irrigation lines. The garden added twelve native plant beds but did not change its opening hours.</p><h4>cal-summary-01-a</h4><pre>The Harbor Garden reopened after volunteers repaired its irrigation lines and added twelve native plant beds.</pre><h4>cal-summary-01-b</h4><pre>The Harbor Garden reopened after volunteers repaired its irrigation lines, and it added twelve new native plant beds.</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>cal-summary-02 · constrained_summary</summary><p><strong>Task:</strong> Summarize the change in no more than 25 words. Include the format, instructors, and new class length.</p><p><strong>Source:</strong> The Ember Workshop moved its classes online during renovations. It kept the same instructors and shortened each class from two hours to ninety minutes.</p><h4>cal-summary-02-b</h4><pre>The Ember Workshop moved classes online during renovations, keeping the same instructors while shortening each session from two hours to ninety minutes.</pre><h4>cal-summary-02-a</h4><pre>The Ember Workshop moved classes online during renovations, maintaining the same instructors while reducing class duration from two hours to ninety minutes.</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>summary-01 · constrained_summary</summary><p><strong>Task:</strong> Summarize the grant in one sentence. Include what it funds and one important exclusion.</p><p><strong>Source:</strong> The Seabird Rescue received a grant to replace three aging boats. The grant covers the boats but not fuel or crew salaries.</p><h4>summary-01-a</h4><pre>The Seabird Rescue received a grant to replace three aging boats, which covers the boats themselves but excludes fuel and crew salaries.</pre><h4>summary-01-b</h4><pre>The Seabird Rescue received a grant to replace three aging boats, but the funding does not cover fuel or crew salaries.</pre><h4>summary-01-short</h4><pre>The Seabird Rescue received a grant to replace three aging boats, which covers the boats themselves but excludes fuel and crew salaries.</pre><h4>summary-01-long</h4><pre>The Seabird Rescue received grant funding to replace three aging boats. The grant covers the cost of the replacement boats themselves, but it does not cover fuel expenses or crew salaries.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>summary-02 · constrained_summary</summary><p><strong>Task:</strong> Summarize the system in two sentences or fewer. Include location, reservation method, and safety check.</p><p><strong>Source:</strong> A neighborhood cooperative installed a shared freezer in the community hall. Members reserve shelves through an online calendar, and the cooperative checks temperatures every morning.</p><h4>summary-02-b</h4><pre>A neighborhood cooperative has placed a shared freezer in the community hall, where members can reserve shelf space using an online calendar. To ensure food safety, the cooperative checks the freezer&#39;s temperature every morning.</pre><h4>summary-02-a</h4><pre>A neighborhood cooperative installed a shared freezer in the community hall, with members reserving shelves through an online calendar. The cooperative ensures food safety by checking temperatures every morning.</pre><h4>summary-02-short</h4><pre>A neighborhood cooperative installed a shared freezer in the community hall, with members reserving shelves through an online calendar. The cooperative ensures food safety by checking temperatures every morning.</pre><h4>summary-02-long</h4><pre>A neighborhood cooperative installed a freezer for shared use in the community hall, and members reserve individual shelves by using an online calendar. To maintain food safety, the cooperative checks the freezer&#39;s temperature every morning.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>summary-03 · constrained_summary</summary><p><strong>Task:</strong> Write a concise summary that includes the closure reason, reopening, and cyclist restriction.</p><p><strong>Source:</strong> The Juniper Trail was closed for six weeks while crews removed fallen trees. It reopened on Saturday, but cyclists must dismount at two narrow sections.</p><h4>summary-03-b</h4><pre>The Juniper Trail was closed for six weeks to allow crews to remove fallen trees. It has since reopened on Saturday, though cyclists are required to dismount at two narrow sections along the trail.</pre><h4>summary-03-a</h4><pre># Juniper Trail Summary
+
+The Juniper Trail was closed for six weeks due to fallen trees that crews removed. It reopened on Saturday, but cyclists are required to dismount their bicycles at two narrow sections along the trail.</pre><h4>summary-03-short</h4><pre># Juniper Trail Summary
+
+The Juniper Trail was closed for six weeks due to fallen trees that crews removed. It reopened on Saturday, but cyclists are required to dismount their bicycles at two narrow sections along the trail.</pre><h4>summary-03-long</h4><pre># Juniper Trail Summary
+
+The Juniper Trail remained closed for six weeks because crews needed to remove fallen trees. The trail reopened on Saturday, but cyclists must get off their bicycles and walk through two narrow sections along the route.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>summary-04 · constrained_summary</summary><p><strong>Task:</strong> Summarize the program in one sentence, naming its eligibility time and both food funding sources.</p><p><strong>Source:</strong> Riverside School launched a breakfast program for students arriving before 8 a.m. Local bakeries donate bread, while the school purchases fruit with cafeteria funds.</p><h4>summary-04-a</h4><pre>Riverside School&#39;s breakfast program, available to students arriving before 8 a.m., is funded through donated bread from local bakeries and fruit purchased with cafeteria funds.</pre><h4>summary-04-b</h4><pre>Riverside School&#39;s breakfast program, available to students who arrive before 8 a.m., is supplied with bread donated by local bakeries and fruit purchased using cafeteria funds.</pre><h4>summary-04-short</h4><pre>Riverside School&#39;s breakfast program, available to students arriving before 8 a.m., is funded through donated bread from local bakeries and fruit purchased with cafeteria funds.</pre><h4>summary-04-long</h4><pre>Riverside School offers a breakfast program to students who arrive before 8 a.m. The program is supported by bread donated by local bakeries and by fruit that is purchased using cafeteria funds.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>summary-05 · constrained_summary</summary><p><strong>Task:</strong> Summarize the recording plan in no more than 30 words.</p><p><strong>Source:</strong> The Atlas Choir recorded its spring concert in the old courthouse. The recording will be released as a free download, but no physical discs will be made.</p><h4>summary-05-a</h4><pre>The Atlas Choir recorded its spring concert in the old courthouse. The recording will be released as a free download, with no physical discs produced.</pre><h4>summary-05-b</h4><pre>The Atlas Choir recorded their spring concert at the old courthouse. The recording will be available as a free download, with no physical discs being produced.</pre><h4>summary-05-short</h4><pre>The Atlas Choir recorded its spring concert in the old courthouse. The recording will be released as a free download, with no physical discs produced.</pre><h4>summary-05-long</h4><pre>The Atlas Choir recorded its spring concert at the old courthouse. The resulting recording will be made available as a free digital download, and no physical discs will be produced.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>summary-06 · constrained_summary</summary><p><strong>Task:</strong> Write one sentence describing the repair and the clock&#39;s new behavior.</p><p><strong>Source:</strong> A repair crew restored the clock on Market Square after replacing its hands and cleaning the mechanism. The clock now chimes only at noon.</p><h4>summary-06-b</h4><pre>A repair crew restored the clock on Market Square by replacing its hands and cleaning the mechanism, and the clock now chimes only at noon.</pre><h4>summary-06-a</h4><pre>A repair crew restored the clock on Market Square by replacing its hands and cleaning the mechanism, and it now chimes only at noon.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>summary-07 · constrained_summary</summary><p><strong>Task:</strong> Summarize the schedule change, including time, days, direction, and weekend limitation.</p><p><strong>Source:</strong> The Pinehill bus route added an express trip at 7:15 a.m. on weekdays. The change affects only the outbound direction and does not add weekend service.</p><h4>summary-07-a</h4><pre># Pinehill Bus Route Schedule Change
+
+The Pinehill bus route added an express trip at 7:15 a.m. on weekdays in the outbound direction only. This change does not include weekend service.</pre><h4>summary-07-b</h4><pre>The Pinehill bus route has added a new express trip at **7:15 a.m.**, available on **weekdays only**. This change applies exclusively to the **outbound direction** and does **not include any additional weekend service**.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>summary-08 · constrained_summary</summary><p><strong>Task:</strong> Summarize what was digitized and how people can view the originals.</p><p><strong>Source:</strong> The Lakeside Archive digitized 3,000 photographs from the 1940s. The originals remain available for in-person viewing by appointment.</p><h4>summary-08-a</h4><pre># Lakeside Archive Digitization Summary
+
+The Lakeside Archive digitized 3,000 photographs from the 1940s. The original photographs remain available for in-person viewing by appointment.</pre><h4>summary-08-b</h4><pre>The Lakeside Archive digitized 3,000 photographs from the 1940s. To view the original photographs, people can do so in person by making an appointment.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>summary-09 · constrained_summary</summary><p><strong>Task:</strong> Write a two-sentence maximum summary that includes the reason and both ticket options.</p><p><strong>Source:</strong> The Meadow Theater postponed its Tuesday performance because of a power outage. Ticket holders may attend Wednesday instead or request a refund.</p><h4>summary-09-b</h4><pre>The Meadow Theater postponed its Tuesday performance due to a power outage. Affected ticket holders can either attend the rescheduled Wednesday performance or request a refund.</pre><h4>summary-09-a</h4><pre>The Meadow Theater postponed its Tuesday performance due to a power outage. Ticket holders can either attend Wednesday&#39;s performance instead or request a refund.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>summary-10 · constrained_summary</summary><p><strong>Task:</strong> Summarize the result without claiming that one mixture was best for tomato growth.</p><p><strong>Source:</strong> The Orchard Lab tested three soil mixtures for rooftop planters. Mixture B retained the most water, but the report says all three supported tomato growth.</p><h4>summary-10-a</h4><pre>The Orchard Lab tested three soil mixtures for rooftop planters. Mixture B retained the most water, and all three mixtures supported tomato growth.</pre><h4>summary-10-b</h4><pre>The Orchard Lab tested three soil mixtures for rooftop planters and found that all three supported tomato growth. Among them, Mixture B retained the most water.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>cal-extract-01 · structured_extraction</summary><p><strong>Task:</strong> Extract the service, hours, days, and contact email as four labeled lines.</p><p><strong>Source:</strong> The Vale Cafe serves breakfast from 7:00 to 10:30 on Monday through Friday. Its contact email is hello@valecafe.example.</p><h4>cal-extract-01-a</h4><pre>Service: Breakfast
+Hours: 7:00 to 10:30
+Days: Monday through Friday
+Contact Email: hello@valecafe.example</pre><h4>cal-extract-01-b</h4><pre>Here are the four labeled lines:
+
+**Service:** Breakfast
+**Hours:** 7:00 to 10:30
+**Days:** Monday through Friday
+**Contact Email:** hello@valecafe.example</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>cal-extract-02 · structured_extraction</summary><p><strong>Task:</strong> Extract date, location, participants, and amount raised. Preserve the units and currency symbol.</p><p><strong>Source:</strong> The 2024 Elm Run took place on May 12 in Redbridge. It had 240 participants and raised $6,000 for tree planting.</p><h4>cal-extract-02-b</h4><pre>Here are the extracted details from the 2024 Elm Run:
+
+- **Date:** May 12, 2024
+- **Location:** Redbridge
+- **Participants:** 240
+- **Amount Raised:** $6,000</pre><h4>cal-extract-02-a</h4><pre>Based on the source passage:
+
+**Date:** May 12, 2024
+
+**Location:** Redbridge
+
+**Participants:** 240
+
+**Amount Raised:** $6,000</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>extract-01 · structured_extraction</summary><p><strong>Task:</strong> Extract opening date, opening time, location, admission cost, and reservation requirement as labeled fields.</p><p><strong>Source:</strong> The Solway exhibit opens on June 4 at 6 p.m. in Gallery Two. Admission is free, but reservations are required.</p><h4>extract-01-b</h4><pre>Here are the labeled fields extracted from the passage:
+
+- **Opening Date:** June 4
+- **Opening Time:** 6 p.m.
+- **Location:** Gallery Two
+- **Admission Cost:** Free
+- **Reservation Requirement:** Reservations are required</pre><h4>extract-01-a</h4><pre>**Opening Date:** June 4
+
+**Opening Time:** 6 p.m.
+
+**Location:** Gallery Two
+
+**Admission Cost:** Free
+
+**Reservation Requirement:** Required</pre><h4>extract-01-short</h4><pre>**Opening Date:** June 4
+
+**Opening Time:** 6 p.m.
+
+**Location:** Gallery Two
+
+**Admission Cost:** Free
+
+**Reservation Requirement:** Required</pre><h4>extract-01-long</h4><pre>**Opening Date:** The exhibit opens on June 4.
+
+**Opening Time:** The opening is scheduled for 6 p.m.
+
+**Location:** The exhibit will be held in Gallery Two.
+
+**Admission Cost:** Admission is free of charge.
+
+**Reservation Requirement:** A reservation is required.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>extract-02 · structured_extraction</summary><p><strong>Task:</strong> Extract crops, area, and sales channels as labeled fields.</p><p><strong>Source:</strong> Marlow Farm grows pears, beans, and lavender on 18 hectares. It sells produce at the Saturday market and through a weekly box scheme.</p><h4>extract-02-a</h4><pre>**Crops:** Pears, beans, and lavender
+
+**Area:** 18 hectares
+
+**Sales Channels:** Saturday market and weekly box scheme</pre><h4>extract-02-b</h4><pre>Here are the labeled fields extracted from the passage:
+
+**Crops:** Pears, beans, and lavender
+
+**Area:** 18 hectares
+
+**Sales Channels:** Saturday market and weekly box scheme</pre><h4>extract-02-short</h4><pre>**Crops:** Pears, beans, and lavender
+
+**Area:** 18 hectares
+
+**Sales Channels:** Saturday market and weekly box scheme</pre><h4>extract-02-long</h4><pre>**Crops:** The crops grown are pears, beans, and lavender.
+
+**Area:** The total area covers 18 hectares.
+
+**Sales Channels:** The products are sold through the Saturday market and through a weekly box scheme.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>extract-03 · structured_extraction</summary><p><strong>Task:</strong> Extract recipient, achievement, venue, and date as labeled fields.</p><p><strong>Source:</strong> The Red Finch award went to Priya Shah for her water-quality study. The ceremony will be held in the Civic Hall on October 9.</p><h4>extract-03-a</h4><pre>**Recipient:** Priya Shah
+
+**Achievement:** Water-quality study
+
+**Venue:** Civic Hall
+
+**Date:** October 9</pre><h4>extract-03-b</h4><pre>Here are the extracted details:
+
+- **Recipient:** Priya Shah
+- **Achievement:** Water-quality study
+- **Venue:** Civic Hall
+- **Date:** October 9</pre><h4>extract-03-short</h4><pre>**Recipient:** Priya Shah
+
+**Achievement:** Water-quality study
+
+**Venue:** Civic Hall
+
+**Date:** October 9</pre><h4>extract-03-long</h4><pre>**Recipient:** The recipient is Priya Shah.
+
+**Achievement:** The recognized achievement is a water-quality study.
+
+**Venue:** The event will take place at Civic Hall.
+
+**Date:** The event is scheduled for October 9.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>extract-04 · structured_extraction</summary><p><strong>Task:</strong> Extract product, affected period, hazard, and customer action as labeled fields.</p><p><strong>Source:</strong> Aster Tools recalled model AT-4 drills made between January and March 2022 because a switch may overheat. Customers should stop using them and contact support.</p><h4>extract-04-a</h4><pre>**Product:** Aster Tools model AT-4 drills
+
+**Affected Period:** January to March 2022
+
+**Hazard:** Switch may overheat
+
+**Customer Action:** Stop using the product and contact support</pre><h4>extract-04-b</h4><pre>Here are the labeled fields extracted from the passage:
+
+**Product:** Aster Tools model AT-4 drills
+
+**Affected Period:** January to March 2022
+
+**Hazard:** A switch may overheat
+
+**Customer Action:** Stop using the drills and contact support</pre><h4>extract-04-short</h4><pre>**Product:** Aster Tools model AT-4 drills
+
+**Affected Period:** January to March 2022
+
+**Hazard:** Switch may overheat
+
+**Customer Action:** Stop using the product and contact support</pre><h4>extract-04-long</h4><pre>**Product:** The affected product is the Aster Tools model AT-4 drill.
+
+**Affected Period:** The affected period runs from January through March 2022.
+
+**Hazard:** The switch may overheat during use.
+
+**Customer Action:** Customers should stop using the product and contact support.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>extract-05 · structured_extraction</summary><p><strong>Task:</strong> Extract frequency, route, operating hours, and exception as labeled fields.</p><p><strong>Source:</strong> The Blue Line shuttle runs every 20 minutes from the station to the museum between 9 a.m. and 5 p.m. It does not operate on Sundays.</p><h4>extract-05-a</h4><pre># Blue Line Shuttle Information
+
+**Frequency:** Every 20 minutes
+
+**Route:** From the station to the museum
+
+**Operating Hours:** 9 a.m. to 5 p.m.
+
+**Exception:** Does not operate on Sundays</pre><h4>extract-05-b</h4><pre>Here are the labeled fields extracted from the passage:
+
+- **Frequency:** Every 20 minutes
+- **Route:** From the station to the museum
+- **Operating Hours:** 9 a.m. to 5 p.m.
+- **Exception:** Does not operate on Sundays</pre><h4>extract-05-short</h4><pre># Blue Line Shuttle Information
+
+**Frequency:** Every 20 minutes
+
+**Route:** From the station to the museum
+
+**Operating Hours:** 9 a.m. to 5 p.m.
+
+**Exception:** Does not operate on Sundays</pre><h4>extract-05-long</h4><pre># Blue Line Shuttle Information
+
+**Frequency:** The shuttle operates every 20 minutes.
+
+**Route:** The route runs from the station to the museum.
+
+**Operating Hours:** The shuttle operates from 9 a.m. until 5 p.m.
+
+**Exception:** The service does not operate on Sundays.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>extract-06 · structured_extraction</summary><p><strong>Task:</strong> Extract title type, author, publication date, editor, and format as labeled fields.</p><p><strong>Source:</strong> Niko Press will publish Lina Ortiz&#39;s essay collection in September 2025. The editor is George Bell, and the planned format is paperback.</p><h4>extract-06-a</h4><pre># Essay Collection by Lina Ortiz
+
+**Title Type:** Essay collection
+
+**Author:** Lina Ortiz
+
+**Publication Date:** September 2025
+
+**Editor:** George Bell
+
+**Format:** Paperback</pre><h4>extract-06-b</h4><pre>Here are the labeled fields extracted from the passage:
+
+- **Title Type:** Essay collection
+- **Author:** Lina Ortiz
+- **Publication Date:** September 2025
+- **Editor:** George Bell
+- **Format:** Paperback</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>extract-07 · structured_extraction</summary><p><strong>Task:</strong> Extract day, hours, service, and booking method as labeled fields.</p><p><strong>Source:</strong> The Westmere clinic offers vaccinations on Wednesdays from 2 to 6 p.m. Appointments can be booked by phone at 555-0148.</p><h4>extract-07-a</h4><pre>**Day:** Wednesday
+
+**Hours:** 2 to 6 p.m.
+
+**Service:** Vaccinations
+
+**Booking Method:** Phone at 555-0148</pre><h4>extract-07-b</h4><pre>Here are the extracted labeled fields from the passage:
+
+- **Day:** Wednesday
+- **Hours:** 2:00 p.m. – 6:00 p.m.
+- **Service:** Vaccinations
+- **Booking Method:** By phone at 555-0148</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>extract-08 · structured_extraction</summary><p><strong>Task:</strong> Extract starter count, main-course count, dessert count, and reservation limit.</p><p><strong>Source:</strong> The Copper Room menu lists two vegan starters, five main courses, and three desserts. The kitchen accepts reservations for parties of up to eight.</p><h4>extract-08-a</h4><pre>Based on the source passage:
+
+- **Starter count:** 2 vegan starters
+- **Main-course count:** 5 main courses
+- **Dessert count:** 3 desserts
+- **Reservation limit:** 8 people</pre><h4>extract-08-b</h4><pre>Based on the passage, here are the extracted details for The Copper Room:
+
+- **Starter count:** 2 (vegan starters)
+- **Main-course count:** 5
+- **Dessert count:** 3
+- **Reservation limit:** Up to 8 people per party</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>extract-09 · structured_extraction</summary><p><strong>Task:</strong> Extract arrival time, destination, survey duration, and crew size as labeled fields.</p><p><strong>Source:</strong> At 14:20, the research vessel Dawn reached Port Ellis after a nine-day survey. The crew consisted of 16 people.</p><h4>extract-09-a</h4><pre>**Arrival Time:** 14:20
+
+**Destination:** Port Ellis
+
+**Survey Duration:** Nine days
+
+**Crew Size:** 16 people</pre><h4>extract-09-b</h4><pre>Here are the extracted details as labeled fields:
+
+- **Arrival Time:** 14:20
+- **Destination:** Port Ellis
+- **Survey Duration:** Nine days
+- **Crew Size:** 16 people</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>extract-10 · structured_extraction</summary><p><strong>Task:</strong> Extract approving body, amount, purpose, ward, and start month as labeled fields.</p><p><strong>Source:</strong> The Birch Council approved a $45,000 grant for playground repairs in Ward 3. Work is scheduled to begin in July.</p><h4>extract-10-b</h4><pre>Here are the extracted labeled fields from the passage:
+
+- **Approving Body:** Birch Council
+- **Amount:** $45,000
+- **Purpose:** Playground repairs
+- **Ward:** Ward 3
+- **Start Month:** July</pre><h4>extract-10-a</h4><pre>**Approving Body:** The Birch Council
+
+**Amount:** $45,000
+
+**Purpose:** Playground repairs
+
+**Ward:** Ward 3
+
+**Start Month:** July</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 13</p></details>
+<details><summary>cal-insufficient-01 · insufficient_evidence</summary><p><strong>Task:</strong> What company manufactured the telescope? Answer only if the passage supports it; otherwise say that the passage does not specify.</p><p><strong>Source:</strong> The Willow Observatory installed a new telescope last spring. The passage does not identify the telescope&#39;s manufacturer or cost.</p><h4>cal-insufficient-01-b</h4><pre>The passage does not specify the manufacturer of the telescope.</pre><h4>cal-insufficient-01-a</h4><pre>The passage does not specify what company manufactured the telescope.</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>cal-insufficient-02 · insufficient_evidence</summary><p><strong>Task:</strong> How long did the coastal survey take? Answer only if supported; otherwise acknowledge that the duration is not specified.</p><p><strong>Source:</strong> The Harbor team completed a coastal survey in August and published a map afterward. The passage gives no details about the survey&#39;s duration.</p><h4>cal-insufficient-02-b</h4><pre>The passage does not specify how long the coastal survey took. It only states that the Harbor team completed a coastal survey in August and published a map afterward, but provides no details about the survey&#39;s duration.</pre><h4>cal-insufficient-02-a</h4><pre>The duration of the coastal survey is not specified in the passage.</pre><p>No human evaluation saved.</p><p><strong>Saved Claude judgments:</strong> 0</p></details>
+<details><summary>insufficient-01 · insufficient_evidence</summary><p><strong>Task:</strong> When did the renovation begin? Answer only if supported; otherwise say that the passage does not specify.</p><p><strong>Source:</strong> The Cedar Hall renovation added accessible entrances and brighter lighting. The passage does not state when the renovation began.</p><h4>insufficient-01-a</h4><pre>The passage does not specify when the renovation began.</pre><h4>insufficient-01-b</h4><pre>The passage does not specify when the renovation began.</pre><h4>insufficient-01-short</h4><pre>The passage does not specify when the renovation began.</pre><h4>insufficient-01-long</h4><pre>The information provided in the passage does not state or otherwise indicate when the renovation began.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>insufficient-02 · insufficient_evidence</summary><p><strong>Task:</strong> Who was elected chair? Answer only if supported; otherwise state that the passage does not identify the person.</p><p><strong>Source:</strong> The River Guild elected a new chair after a member vote. The passage names neither the chair nor the vote count.</p><h4>insufficient-02-a</h4><pre>The passage does not identify the person who was elected chair.</pre><h4>insufficient-02-b</h4><pre>The passage does not identify the person elected as chair.</pre><h4>insufficient-02-short</h4><pre>The passage does not identify the person who was elected chair.</pre><h4>insufficient-02-long</h4><pre>The information given in the passage does not identify or provide the name of the person who was elected chair.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>insufficient-03 · insufficient_evidence</summary><p><strong>Task:</strong> What is the project&#39;s total weight? Answer only if supported; otherwise acknowledge that it is not specified.</p><p><strong>Source:</strong> The Lark project uses recycled steel and has a modular design. The passage does not give its total weight.</p><h4>insufficient-03-b</h4><pre>The passage does not specify the Lark project&#39;s total weight.</pre><h4>insufficient-03-a</h4><pre>The total weight of the Lark project is not specified in the passage.</pre><h4>insufficient-03-short</h4><pre>The total weight of the Lark project is not specified in the passage.</pre><h4>insufficient-03-long</h4><pre>The passage does not provide any information specifying the total weight of the Lark project.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>insufficient-04 · insufficient_evidence</summary><p><strong>Task:</strong> At what time did the delivery arrive? Answer only if supported; otherwise say that the passage does not specify.</p><p><strong>Source:</strong> A winter storm delayed the Hilltop delivery. The passage says the delivery arrived later but does not identify the original or actual arrival time.</p><h4>insufficient-04-a</h4><pre>The passage does not specify the arrival time of the delivery.</pre><h4>insufficient-04-b</h4><pre>The passage does not specify the time the delivery arrived.</pre><h4>insufficient-04-short</h4><pre>The passage does not specify the arrival time of the delivery.</pre><h4>insufficient-04-long</h4><pre>The information presented in the passage does not state or otherwise specify the time at which the delivery arrived.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>insufficient-05 · insufficient_evidence</summary><p><strong>Task:</strong> How many paintings are in the exhibit? Answer only if supported; otherwise state that the passage does not specify.</p><p><strong>Source:</strong> The museum&#39;s new exhibit features paintings from several local artists. The passage does not list the artists&#39; names or the number of paintings.</p><h4>insufficient-05-b</h4><pre>The passage does not specify the number of paintings in the exhibit.</pre><h4>insufficient-05-a</h4><pre>The passage does not specify how many paintings are in the exhibit.</pre><h4>insufficient-05-short</h4><pre>The passage does not specify how many paintings are in the exhibit.</pre><h4>insufficient-05-long</h4><pre>The passage does not provide a specific number indicating how many paintings are included in the exhibit.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 24</p></details>
+<details><summary>insufficient-06 · insufficient_evidence</summary><p><strong>Task:</strong> How many stops were added? Answer only if supported; otherwise acknowledge that the passage does not specify.</p><p><strong>Source:</strong> The Green Loop was extended toward the airport and now has additional stops. The passage does not say how many stops were added.</p><h4>insufficient-06-b</h4><pre>The passage does not specify how many stops were added to the Green Loop.</pre><h4>insufficient-06-a</h4><pre>The passage does not specify how many stops were added to the Green Loop.</pre><p><strong>Human preference:</strong> a</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>insufficient-07 · insufficient_evidence</summary><p><strong>Task:</strong> Which company provides the appointment software? Answer only if supported; otherwise say that the passage does not specify.</p><p><strong>Source:</strong> The clinic introduced a new appointment system that patients praised for being easier to use. The passage does not name the software provider.</p><h4>insufficient-07-a</h4><pre>The passage does not specify which company provides the appointment software.</pre><h4>insufficient-07-b</h4><pre>The passage does not specify which company provides the appointment software.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>insufficient-08 · insufficient_evidence</summary><p><strong>Task:</strong> How much did the roof replacement cost? Answer only if supported; otherwise state that the passage does not specify.</p><p><strong>Source:</strong> The school replaced its roof before the rainy season. The passage does not identify the contractor or the project&#39;s price.</p><h4>insufficient-08-a</h4><pre>The passage does not specify the cost of the roof replacement.</pre><h4>insufficient-08-b</h4><pre>The passage does not specify the cost of the roof replacement.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>insufficient-09 · insufficient_evidence</summary><p><strong>Task:</strong> How many hours did maintenance take? Answer only if supported; otherwise say that the passage does not specify.</p><p><strong>Source:</strong> The observatory&#39;s report describes clearer images after maintenance. It does not state how many hours the maintenance required.</p><h4>insufficient-09-b</h4><pre>The passage does not specify how many hours the maintenance required.</pre><h4>insufficient-09-a</h4><pre>The passage does not specify how many hours the maintenance required.</pre><p><strong>Human preference:</strong> b</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+<details><summary>insufficient-10 · insufficient_evidence</summary><p><strong>Task:</strong> How many seats are in the revised plan? Answer only if supported; otherwise acknowledge that the passage does not specify.</p><p><strong>Source:</strong> The theater announced a revised seating plan for its next performance. The passage does not describe the number or arrangement of seats.</p><h4>insufficient-10-b</h4><pre>The passage does not specify the number of seats in the revised plan.</pre><h4>insufficient-10-a</h4><pre>The passage does not specify how many seats are in the revised plan.</pre><p><strong>Human preference:</strong> tie</p><p><strong>Saved Claude judgments:</strong> 16</p></details>
+  </div>
+
+  <h2>Methodology</h2>
+  <div class="panel">
+    <ul>
+      <li>48 source-grounded synthetic tasks: 8 calibration and 40 held-out evaluation tasks.</li>
+      <li>Two prompt versions: a baseline and an anchored rubric.</li>
+      <li>Correctness, relevance, completeness, unsupported claims, and a declared preference.</li>
+      <li>Human labels are recorded before automated judgments and reference answers are hidden from the judge.</li>
+      <li>Conclusions are exploratory and specific to the pinned model, prompts, and dataset.</li>
+    </ul>
+    <p>Dataset provenance: AI-assisted, human-reviewed synthetic dataset. Report generated: 2026-09-22T21:25:33.302Z.</p>
+  </div>
+</main>
+<script type="application/json" id="report-data">{"summary":{"totalJudgments":800,"completedJudgments":797,"failedJudgments":3,"byModel":{"haiku":{"modelKey":"haiku","model":"claude-haiku-4-5-20251001","totalJudgments":400,"completedJudgments":397,"failedJudgments":3,"unalignedJudgments":0,"byPrompt":{"baseline":{"denominator":39,"preferenceAgreement":0.38461538461538464,"preferenceAgreementInterval":[0.24891162547007065,0.5410121868992154],"cohenKappa":0,"meanAbsoluteError":{"correctness":0.19230769230769232,"relevance":0.15384615384615385,"completeness":0.19230769230769232},"unsupportedClaims":{"truePositive":0,"trueNegative":70,"falsePositive":0,"falseNegative":8},"declaredRuleDisagreements":0,"actualBatchCostUsd":0.16808499999999998},"anchored":{"denominator":40,"preferenceAgreement":0.4,"preferenceAgreementInterval":[0.2634811061240136,0.5540438017260649],"cohenKappa":0,"meanAbsoluteError":{"correctness":0.1875,"relevance":0.15,"completeness":0.1875},"unsupportedClaims":{"truePositive":0,"trueNegative":72,"falsePositive":0,"falseNegative":8},"declaredRuleDisagreements":0,"actualBatchCostUsd":0.1700385}},"biasByPrompt":{"baseline":{"repeatability":1,"positionChangeRate":0,"verbosity":{"longerWins":0,"shorterWins":6,"ties":34,"total":40}},"anchored":{"repeatability":1,"positionChangeRate":0.025,"verbosity":{"longerWins":0,"shorterWins":5,"ties":35,"total":40}}}},"sonnet":{"modelKey":"sonnet","model":"claude-sonnet-4-6","totalJudgments":400,"completedJudgments":400,"failedJudgments":0,"unalignedJudgments":0,"byPrompt":{"baseline":{"denominator":40,"preferenceAgreement":0.4,"preferenceAgreementInterval":[0.2634811061240136,0.5540438017260649],"cohenKappa":0,"meanAbsoluteError":{"correctness":0.1875,"relevance":0.15,"completeness":0.1875},"unsupportedClaims":{"truePositive":0,"trueNegative":72,"falsePositive":0,"falseNegative":8},"declaredRuleDisagreements":0,"actualBatchCostUsd":0.43282050000000005},"anchored":{"denominator":40,"preferenceAgreement":0.4,"preferenceAgreementInterval":[0.2634811061240136,0.5540438017260649],"cohenKappa":0,"meanAbsoluteError":{"correctness":0.1875,"relevance":0.15,"completeness":0.1875},"unsupportedClaims":{"truePositive":0,"trueNegative":72,"falsePositive":0,"falseNegative":8},"declaredRuleDisagreements":0,"actualBatchCostUsd":0.42953549999999985}},"biasByPrompt":{"baseline":{"repeatability":1,"positionChangeRate":0.075,"verbosity":{"longerWins":0,"shorterWins":14,"ties":26,"total":40}},"anchored":{"repeatability":1,"positionChangeRate":0.05,"verbosity":{"longerWins":0,"shorterWins":10,"ties":30,"total":40}}}}},"byPrompt":{"baseline":{"denominator":39,"preferenceAgreement":0.38461538461538464,"preferenceAgreementInterval":[0.24891162547007065,0.5410121868992154],"cohenKappa":0,"meanAbsoluteError":{"correctness":0.19230769230769232,"relevance":0.15384615384615385,"completeness":0.19230769230769232},"unsupportedClaims":{"truePositive":0,"trueNegative":70,"falsePositive":0,"falseNegative":8},"declaredRuleDisagreements":0,"actualBatchCostUsd":0.16808499999999998},"anchored":{"denominator":40,"preferenceAgreement":0.4,"preferenceAgreementInterval":[0.2634811061240136,0.5540438017260649],"cohenKappa":0,"meanAbsoluteError":{"correctness":0.1875,"relevance":0.15,"completeness":0.1875},"unsupportedClaims":{"truePositive":0,"trueNegative":72,"falsePositive":0,"falseNegative":8},"declaredRuleDisagreements":0,"actualBatchCostUsd":0.1700385}},"biasByPrompt":{"baseline":{"repeatability":1,"positionChangeRate":0,"verbosity":{"longerWins":0,"shorterWins":6,"ties":34,"total":40}},"anchored":{"repeatability":1,"positionChangeRate":0.025,"verbosity":{"longerWins":0,"shorterWins":5,"ties":35,"total":40}}}},"metadata":{"model":"claude-haiku-4-5-20251001 + claude-sonnet-4-6","provenance":"AI-assisted, human-reviewed synthetic dataset","generatedAt":"2026-09-22T21:25:33.302Z"}}</script>
+</body>
+</html>
